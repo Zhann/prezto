@@ -10,5 +10,42 @@ if [[ -s "${ZDOTDIR:-$HOME}/.zprezto/init.zsh" ]]; then
   source "${ZDOTDIR:-$HOME}/.zprezto/init.zsh"
 fi
 
-# Customize to your needs...
+# exports, functions and aliases
+alias airplayfix='sudo pkill coreaudiod'
+alias dog='dig +short'
+alias knifeprod='CHEF_ENV=production knife'
+alias myip="curl eth0.me"
+alias november="LANG=en_US.UTF-8 mosh steven@november.openminds.be --server=/opt/mosh/bin/ms -- screen -raAd"
+# alias irc="ssh jupiter -t screen -raAd irssi"
+alias irc="LANG=en_US.UTF-8 mosh steven@jupiter.banteng.be -- screen -raAd irssi"
+alias r="bundle exec rails"
+alias takeover="tmux detach -a"
+alias wtf_is_my_ip='curl -s wtfismyip.com/json | sed -E -e "s/(\"|{|}|,)//g" -e "s/ :/:/g"'
 
+kcu() { echo "sandbox:\n--------" && CHEF_ENV=sandbox knife cookbook upload $@ && echo "\nproduction:\n-----------" && CHEF_ENV=production knife cookbook upload $@ }
+
+export EDITOR=vim
+export LANG=en_US.UTF-8
+export LC_CTYPE=en_US.UTF-8
+
+dug() { dig +short -x $(dig +short $1) }
+whatserver() { curl -Is $1 | ack server | cut -f 2 -d " " }
+function ta {
+if [ -z $1 ]; then
+  tmux list-sessions &>/dev/null || { echo 'no tmux sessions'; return; }
+  sessions=`tmux list-sessions | wc -l`
+  [[ $sessions -eq 1 ]] && tmux attach || tmux list-sessions
+else
+  tmux attach-session -t $1 || tmux new-session -s $1
+fi
+}
+
+# Raise ulimit for knife ssh
+ulimit -n 4096
+
+# autojump
+[[ -s `brew --prefix`/etc/autojump.sh ]] && . `brew --prefix`/etc/autojump.sh
+
+# chruby
+source /usr/local/opt/chruby/share/chruby/chruby.sh
+source /usr/local/opt/chruby/share/chruby/auto.sh
